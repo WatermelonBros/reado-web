@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+@theme {
+  /* Reado Dark — exact app tokens (gray-blue base, never black). */
+  --color-bg: oklch(0.2 0.018 250);
+  --color-bg-2: oklch(0.24 0.02 250);
+  --color-overlay: oklch(0.27 0.022 250);
+  --color-ink: oklch(0.8 0.012 250);
+  --color-muted: oklch(0.62 0.012 250);
+  --color-faint: oklch(0.5 0.012 250);
+  --color-line: oklch(0.32 0.02 250);
+  --color-line-2: oklch(0.42 0.02 250);
+
+  /* Primary accent = the app's keyword blue. */
+  --color-accent: oklch(0.74 0.11 260);
+  --color-on-accent: oklch(0.98 0.01 260);
+  /* Reado's annotation marker — warm, outside the syntax palette. The site's
+     "comment / review" motif; ties the page to the product. */
+  --color-marker: oklch(0.72 0.16 35);
+
+  --color-syn-control: oklch(0.74 0.12 330);
+  --color-syn-keyword: oklch(0.74 0.11 260);
+  --color-syn-def: oklch(0.8 0.11 95);
+  --color-syn-string: oklch(0.76 0.11 150);
+  --color-syn-number: oklch(0.76 0.12 55);
+  --color-syn-comment: oklch(0.55 0.02 250);
+  --color-syn-punct: oklch(0.66 0.012 250);
+
+  --shadow: 0 12px 32px oklch(0.12 0.02 250 / 0.5);
+
+  --font-display: var(--font-fraunces);
+  --font-sans: var(--font-hanken);
+  --font-mono: var(--font-jbmono);
+}
+
+html {
+  background: var(--color-bg);
+  color-scheme: dark;
+  scroll-behavior: smooth;
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+body {
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+::selection {
+  background: oklch(0.74 0.11 260 / 0.28);
+}
