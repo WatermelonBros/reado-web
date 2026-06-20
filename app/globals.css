@@ -32,6 +32,11 @@
   --marker: oklch(0.72 0.16 35);
   --marker-soft: oklch(0.72 0.16 35 / 0.16);
 
+  /* macOS-style window traffic-light dots in the mock titlebar. */
+  --traffic-red: #e8675b;
+  --traffic-amber: #e3b341;
+  --traffic-green: #5fb865;
+
   --selection: oklch(0.74 0.11 260 / 0.28);
   --shadow: 0 12px 32px oklch(0.12 0.02 250 / 0.5);
 
@@ -53,7 +58,27 @@
   --color-accent: var(--accent);
   --color-on-accent: var(--accent-contrast);
   --color-marker: var(--marker);
+  --color-marker-soft: var(--marker-soft);
   --color-selection: var(--selection);
+  --color-syn-control: var(--syn-control);
+  --color-syn-keyword: var(--syn-keyword);
+  --color-syn-definition: var(--syn-definition);
+  --color-syn-string: var(--syn-string);
+  --color-syn-number: var(--syn-number);
+  --color-syn-comment: var(--syn-comment);
+  --color-syn-punctuation: var(--syn-punctuation);
+  /* The thread popover surface (muted tint over the elevated bg). */
+  --color-thread: color-mix(in oklab, var(--text-muted) 16%, var(--bg-elevated));
+  /* The annotated code line once the agent has resolved it. */
+  --color-string-soft: color-mix(in oklch, var(--syn-string) 12%, transparent);
+
+  /* Marker rails on an annotated code line (open vs resolved). */
+  --shadow-marker: inset 2px 0 0 var(--marker);
+  --shadow-string: inset 2px 0 0 var(--syn-string);
+  --shadow-elevated: var(--shadow);
+  --color-traffic-red: var(--traffic-red);
+  --color-traffic-amber: var(--traffic-amber);
+  --color-traffic-green: var(--traffic-green);
 
   --font-sans: var(--font-hanken), -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;

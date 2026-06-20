@@ -25,19 +25,13 @@ export function CodeVignette() {
     [["createRoot", "d"], ["(el).", "p"], ["render", "d"], ["(<App />)", "p"]],
   ];
   return (
-    <div className={`${frame} py-3 font-mono text-[13px]`} style={{ lineHeight: 1.95 }}>
+    <div className={`${frame} py-3 font-mono text-[13px] leading-[1.95]`}>
       {lines.map((line, i) => (
         <div
           key={i}
-          className="flex gap-4 px-4 whitespace-pre"
-          style={
-            i === 2
-              ? {
-                  background: "var(--marker-soft)",
-                  boxShadow: "inset 2px 0 0 var(--marker)",
-                }
-              : undefined
-          }
+          className={`flex gap-4 px-4 whitespace-pre ${
+            i === 2 ? "bg-marker-soft shadow-marker" : ""
+          }`}
         >
           <span className="w-4 flex-none text-right text-faint/60 select-none">{i + 1}</span>
           <span className="overflow-hidden">
@@ -57,17 +51,11 @@ export function CodeVignette() {
 export function ThreadVignette() {
   return (
     <div className={`${frame} bg-surface p-4`}>
-      <div
-        className="overflow-hidden"
-        style={{
-          background: "color-mix(in oklab, var(--text-muted) 16%, var(--bg-elevated))",
-          borderRadius: "0 8px 8px 8px",
-        }}
-      >
+      <div className="overflow-hidden rounded-lg rounded-tl-none bg-thread">
         <div className="flex items-center gap-2 border-b border-line px-3 py-2.5 text-xs">
-          <span className="h-2 w-2 rounded-full" style={{ background: "var(--syn-control)" }} />
+          <span className="h-2 w-2 rounded-full bg-syn-control" />
           <span className="text-ink">Question</span>
-          <span style={{ color: "var(--syn-string)" }}>Done</span>
+          <span className="text-syn-string">Done</span>
           <span className="ml-auto font-mono text-faint">Line 6</span>
         </div>
         <div className="space-y-3 px-4 py-3 text-[13.5px]">
@@ -82,7 +70,7 @@ export function ThreadVignette() {
         </div>
         <div className="flex items-center justify-between border-t border-line px-3 py-2 text-xs">
           <span className="text-muted">Task</span>
-          <span style={{ color: "var(--syn-string)" }}>✓ committed</span>
+          <span className="text-syn-string">✓ committed</span>
         </div>
       </div>
     </div>

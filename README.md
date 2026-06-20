@@ -3,7 +3,7 @@
 The marketing site for [Reado](https://github.com/WatermelonBros/reado), a calm,
 read-first code IDE. Built with Next.js (App Router) and Tailwind CSS 4, with a
 GSAP + Lenis scroll-driven product tour. Fully static — exported to `out/` and
-served from Cloudflare Pages.
+served from Cloudflare Workers (static assets).
 
 ## Develop
 
@@ -18,19 +18,16 @@ pnpm dev          # http://localhost:3000
 pnpm build        # static export → ./out
 ```
 
-## Deploy (Cloudflare Pages)
+## Deploy (Cloudflare Workers static assets)
 
-**Git integration (recommended):** connect this repo in the Cloudflare dashboard
-and set:
-
-- Build command: `pnpm build`
-- Output directory: `out`
-
-**Or from the CLI:**
+The static export in `out/` is served by a Worker. `wrangler.toml` declares the
+assets directory (`[assets] directory = "./out"`), so deploying is:
 
 ```bash
 pnpm build
-npx wrangler pages deploy out
+npx wrangler deploy
 ```
 
-`wrangler.toml` already declares `pages_build_output_dir = "out"`.
+**Git integration:** connect this repo in the Cloudflare dashboard with build
+command `pnpm build` and the same `wrangler.toml` — Cloudflare builds and
+uploads `out/` on push.

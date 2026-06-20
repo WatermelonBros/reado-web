@@ -97,7 +97,7 @@ function FileGlyph({ dir, expanded }: { dir: boolean; expanded?: boolean }) {
       {...svg}
       width={15}
       height={15}
-      style={{ color: dir ? "var(--accent)" : "var(--text-faint)", flex: "none" }}
+      className={`flex-none ${dir ? "text-accent" : "text-faint"}`}
       aria-hidden
     >
       {dir ? (
@@ -114,14 +114,15 @@ function FileGlyph({ dir, expanded }: { dir: boolean; expanded?: boolean }) {
 }
 
 /* ---- syntax-coloured source (src/main.tsx) ------------------------------ */
-const C = {
+// Short keys (k/s/d/c/p) keep the CODE token table below readable line-by-line.
+const SYN = {
   k: "var(--syn-keyword)",
   s: "var(--syn-string)",
   d: "var(--syn-definition)",
   c: "var(--syn-comment)",
   p: "var(--syn-punctuation)",
 } as const;
-type Tok = [string, keyof typeof C];
+type Tok = [string, keyof typeof SYN];
 const CODE: Tok[][] = [
   [["// entry point — mount the React tree", "c"]],
   [["import ", "k"], ["{ createRoot } ", "p"], ["from ", "k"], ['"react-dom/client"', "s"], [";", "p"]],
@@ -288,9 +289,9 @@ export function ReadoMock() {
       {/* window titlebar (desktop app chrome) */}
       <div className="flex flex-none items-center gap-3 border-b border-line bg-surface px-4 py-2.5">
         <span className="flex gap-2" aria-hidden>
-          <i className="h-3 w-3 rounded-full bg-[#e8675b]" />
-          <i className="h-3 w-3 rounded-full bg-[#e3b341]" />
-          <i className="h-3 w-3 rounded-full bg-[#5fb865]" />
+          <i className="h-3 w-3 rounded-full bg-traffic-red" />
+          <i className="h-3 w-3 rounded-full bg-traffic-amber" />
+          <i className="h-3 w-3 rounded-full bg-traffic-green" />
         </span>
         <span className="ml-2 font-mono text-xs text-faint">
           reado — codebase-reader
@@ -304,8 +305,7 @@ export function ReadoMock() {
           <div className="relative flex flex-col items-center gap-1">
             <span
               aria-hidden
-              className="absolute left-0 h-7 w-0.5 rounded-full bg-accent"
-              style={{ top: 6 }}
+              className="absolute top-1.5 left-0 h-7 w-0.5 rounded-full bg-accent"
             />
             {[FilesIcon, SearchIcon, MessageIcon, OutlineIcon, GitBranchIcon].map(
               (Icon, i) => (
@@ -390,37 +390,29 @@ export function ReadoMock() {
 
           {/* code */}
           <div
-            className="flex-1 overflow-hidden py-4 font-mono"
-            style={{ fontSize: 16, lineHeight: 1.9 }}
+            className="flex-1 overflow-hidden py-4 font-mono text-base leading-[1.9]"
           >
             {CODE.map((line, i) => {
               const marked = i === MARK_LINE;
               return (
                 <div
                   key={i}
-                  className="flex gap-5 px-4 whitespace-pre"
-                  style={
+                  className={`flex gap-5 px-4 whitespace-pre ${
                     marked
-                      ? {
-                          background: resolved
-                            ? "color-mix(in oklch, var(--syn-string) 12%, transparent)"
-                            : "var(--marker-soft)",
-                          boxShadow: `inset 2px 0 0 ${
-                            resolved ? "var(--syn-string)" : "var(--marker)"
-                          }`,
-                        }
-                      : undefined
-                  }
+                      ? resolved
+                        ? "bg-string-soft shadow-string"
+                        : "bg-marker-soft shadow-marker"
+                      : ""
+                  }`}
                 >
                   <span className="relative w-7 flex-none text-right text-faint/70 select-none">
                     {i + 1}
                     {marked && (
                       <span
                         aria-hidden
-                        className="absolute top-1/2 -right-[14px] h-2 w-2 -translate-y-1/2 rounded-full"
-                        style={{
-                          background: resolved ? "var(--syn-string)" : "var(--marker)",
-                        }}
+                        className={`absolute top-1/2 -right-[14px] h-2 w-2 -translate-y-1/2 rounded-full ${
+                          resolved ? "bg-syn-string" : "bg-marker"
+                        }`}
                       />
                     )}
                   </span>
@@ -429,7 +421,7 @@ export function ReadoMock() {
                       " "
                     ) : (
                       line.map(([text, kind], j) => (
-                        <span key={j} style={{ color: C[kind] }}>
+                        <span key={j} style={{ color: SYN[kind] }}>
                           {text}
                         </span>
                       ))
@@ -442,25 +434,20 @@ export function ReadoMock() {
 
           {/* comment thread popover */}
           <div
-            className="absolute top-[170px] right-5 z-30 flex w-[min(420px,calc(100%-2rem))] flex-col"
-            style={{
-              background: "color-mix(in oklab, var(--text-muted) 16%, var(--bg-elevated))",
-              borderRadius: "0 8px 8px 8px",
-              boxShadow: "var(--shadow)",
-            }}
+            className="absolute top-[170px] right-5 z-30 flex w-[min(420px,calc(100%-2rem))] flex-col rounded-lg rounded-tl-none bg-thread shadow-elevated"
           >
             {/* header */}
             <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5 border-b border-line px-3 py-2.5">
               <span className="inline-flex items-center gap-1.5 rounded-md px-1.5 py-0.5 text-xs text-ink">
                 <span
-                  className="inline-block h-2 w-2 flex-none rounded-full"
-                  style={{ background: "var(--syn-control)" }}
+                  className="inline-block h-2 w-2 flex-none rounded-full bg-syn-control"
                 />
                 Question
               </span>
               <span
-                className="rounded-md px-1.5 py-0.5 text-xs"
-                style={{ color: resolved ? "var(--syn-string)" : "var(--text-muted)" }}
+                className={`rounded-md px-1.5 py-0.5 text-xs ${
+                  resolved ? "text-syn-string" : "text-muted"
+                }`}
               >
                 {resolved ? "Done" : "Open"}
               </span>
@@ -520,26 +507,21 @@ export function ReadoMock() {
               <div className="mt-2 flex items-center justify-between">
                 <span className="inline-flex items-center gap-1.5 text-xs text-muted">
                   <span
-                    className="grid h-3.5 w-3.5 place-items-center rounded-sm text-[9px]"
-                    style={{
-                      background: "var(--accent)",
-                      color: "var(--accent-contrast)",
-                    }}
+                    className="grid h-3.5 w-3.5 place-items-center rounded-sm bg-accent text-on-accent text-[9px]"
                   >
                     ✓
                   </span>
                   Task
                 </span>
                 {resolved ? (
-                  <span className="text-xs font-semibold" style={{ color: "var(--syn-string)" }}>
+                  <span className="text-xs font-semibold text-syn-string">
                     ✓ Done
                   </span>
                 ) : (
                   <span className="flex items-center gap-1">
                     <span className="rounded-md px-2 py-1 text-xs text-muted">Delete</span>
                     <span
-                      className="rounded-md px-2.5 py-1 text-xs font-semibold"
-                      style={{ background: "var(--accent)", color: "var(--accent-contrast)" }}
+                      className="rounded-md bg-accent px-2.5 py-1 text-xs font-semibold text-on-accent"
                     >
                       Reply
                     </span>

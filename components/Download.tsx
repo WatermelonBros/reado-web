@@ -25,6 +25,32 @@ function detectOS(): OS {
 const fmtStars = (n: number) =>
   n >= 1000 ? `${(n / 1000).toFixed(n >= 10000 ? 0 : 1)}k` : String(n);
 
+// Tiny TTL cache over localStorage so a reloading/returning visitor doesn't
+// re-hit GitHub's 60/h anonymous rate limit. ponytail: localStorage + TTL, no
+// dep — swap for react-query + a persister only if this grows past two GETs.
+const CACHE_TTL = 60 * 60 * 1000; // 1h, matches GitHub's anon rate-limit window
+
+async function cachedJson<T>(url: string, key: string): Promise<T> {
+  try {
+    const hit = localStorage.getItem(key);
+    if (hit) {
+      const { t, v } = JSON.parse(hit) as { t: number; v: T };
+      if (Date.now() - t < CACHE_TTL) return v;
+    }
+  } catch {
+    // corrupt/unavailable storage — fall through to a live fetch
+  }
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(`${key} ${r.status}`);
+  const v = (await r.json()) as T;
+  try {
+    localStorage.setItem(key, JSON.stringify({ t: Date.now(), v }));
+  } catch {
+    // quota/private-mode — caching is best-effort, ignore
+  }
+  return v;
+}
+
 const Arrow = () => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
     <path d="M12 4v13m0 0l5-5m-5 5l-5-5M5 20h14" />
@@ -44,9 +70,11 @@ export function Download() {
 
   useEffect(() => {
     setOs(detectOS());
-    fetch("https://api.github.com/repos/WatermelonBros/reado/releases/latest")
-      .then((r) => (r.ok ? r.json() : Promise.reject()))
-      .then((rel: { assets?: { name: string; browser_download_url: string }[] }) => {
+    cachedJson<{ assets?: { name: string; browser_download_url: string }[] }>(
+      "https://api.github.com/repos/WatermelonBros/reado/releases/latest",
+      "reado:releases",
+    )
+      .then((rel) => {
         const found = TARGETS.map((t) => {
           const a = (rel.assets ?? []).find((x) => t.re.test(x.name));
           return a ? { ...t, url: a.browser_download_url } : null;
@@ -55,9 +83,11 @@ export function Download() {
       })
       .catch(() => setAssets([]));
 
-    fetch("https://api.github.com/repos/WatermelonBros/reado")
-      .then((r) => (r.ok ? r.json() : Promise.reject()))
-      .then((repo: { stargazers_count?: number }) => {
+    cachedJson<{ stargazers_count?: number }>(
+      "https://api.github.com/repos/WatermelonBros/reado",
+      "reado:repo",
+    )
+      .then((repo) => {
         if (typeof repo.stargazers_count === "number") setStars(repo.stargazers_count);
       })
       .catch(() => {});

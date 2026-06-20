@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useSyncExternalStore } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ReadoMock } from "./ReadoMock";
@@ -78,26 +78,26 @@ const focus = (b: Beat) => ({
   yPercent: -(b.cy - 0.5) * b.scale * 100,
 });
 
+// The pinned, scroll-scrubbed tour only runs on a real pointer + wide screen.
+// Touch / narrow / reduced-motion get a clean stacked layout instead. Read as an
+// external store so the right layout is chosen during the first client render
+// (pre-paint) instead of in a post-paint effect that would flash the wrong one.
+const REDUCED_QUERY = "(max-width: 1023px), (prefers-reduced-motion: reduce)";
+const subscribeReduced = (cb: () => void) => {
+  const mql = matchMedia(REDUCED_QUERY);
+  mql.addEventListener("change", cb);
+  return () => mql.removeEventListener("change", cb);
+};
+
 export function ScrollStory() {
   const pinRef = useRef<HTMLDivElement>(null);
   const mockRef = useRef<HTMLDivElement>(null);
   const capsRef = useRef<HTMLDivElement>(null);
-  const [reduced, setReduced] = useState(false);
-
-  // The pinned, scroll-scrubbed tour only runs on a real pointer + wide screen.
-  // Touch / narrow / reduced-motion get a clean stacked layout instead.
-  useEffect(() => {
-    const small = matchMedia("(max-width: 1023px)");
-    const reduce = matchMedia("(prefers-reduced-motion: reduce)");
-    const update = () => setReduced(small.matches || reduce.matches);
-    update();
-    small.addEventListener("change", update);
-    reduce.addEventListener("change", update);
-    return () => {
-      small.removeEventListener("change", update);
-      reduce.removeEventListener("change", update);
-    };
-  }, []);
+  const reduced = useSyncExternalStore(
+    subscribeReduced,
+    () => matchMedia(REDUCED_QUERY).matches,
+    () => false, // server snapshot: static export ships the desktop layout
+  );
 
   useEffect(() => {
     if (reduced) return;
