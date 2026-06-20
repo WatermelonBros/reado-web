@@ -1,55 +1,156 @@
 @import "tailwindcss";
 
-@theme {
-  /* Reado Dark — exact app tokens (gray-blue base, never black). */
-  --color-bg: oklch(0.2 0.018 250);
-  --color-bg-2: oklch(0.24 0.02 250);
-  --color-overlay: oklch(0.27 0.022 250);
-  --color-ink: oklch(0.8 0.012 250);
-  --color-muted: oklch(0.62 0.012 250);
-  --color-faint: oklch(0.5 0.012 250);
-  --color-line: oklch(0.32 0.02 250);
-  --color-line-2: oklch(0.42 0.02 250);
+/*
+ * Reado design tokens (OKLCH), copied 1:1 from the app's tokens.css reado-dark
+ * theme so the in-page product mock is colour-faithful to the real IDE.
+ */
+:root {
+  color-scheme: dark;
 
-  /* Primary accent = the app's keyword blue. */
-  --color-accent: oklch(0.74 0.11 260);
-  --color-on-accent: oklch(0.98 0.01 260);
-  /* Reado's annotation marker — warm, outside the syntax palette. The site's
-     "comment / review" motif; ties the page to the product. */
-  --color-marker: oklch(0.72 0.16 35);
+  --bg: oklch(0.2 0.018 250);
+  --bg-elevated: oklch(0.24 0.02 250);
+  --bg-overlay: oklch(0.27 0.022 250);
+  --border: oklch(0.32 0.02 250);
+  --border-strong: oklch(0.42 0.02 250);
+  --text: oklch(0.8 0.012 250);
+  --text-muted: oklch(0.62 0.012 250);
+  --text-faint: oklch(0.5 0.012 250);
+  /* A brighter near-white (still tinted) for high-impact display headings. */
+  --text-bright: oklch(0.95 0.008 250);
 
-  --color-syn-control: oklch(0.74 0.12 330);
-  --color-syn-keyword: oklch(0.74 0.11 260);
-  --color-syn-def: oklch(0.8 0.11 95);
-  --color-syn-string: oklch(0.76 0.11 150);
-  --color-syn-number: oklch(0.76 0.12 55);
-  --color-syn-comment: oklch(0.55 0.02 250);
-  --color-syn-punct: oklch(0.66 0.012 250);
+  --accent: oklch(0.74 0.11 260);
+  --accent-contrast: oklch(0.98 0.01 260);
 
+  --syn-control: oklch(0.74 0.12 330);
+  --syn-keyword: oklch(0.74 0.11 260);
+  --syn-definition: oklch(0.8 0.11 95);
+  --syn-string: oklch(0.76 0.11 150);
+  --syn-number: oklch(0.76 0.12 55);
+  --syn-comment: oklch(0.55 0.02 250);
+  --syn-punctuation: oklch(0.66 0.012 250);
+
+  --marker: oklch(0.72 0.16 35);
+  --marker-soft: oklch(0.72 0.16 35 / 0.16);
+
+  --selection: oklch(0.74 0.11 260 / 0.28);
   --shadow: 0 12px 32px oklch(0.12 0.02 250 / 0.5);
 
-  --font-display: var(--font-fraunces);
-  --font-sans: var(--font-hanken);
-  --font-mono: var(--font-jbmono);
+  --code-line-height: 1.65;
 }
 
-html {
-  background: var(--color-bg);
-  color-scheme: dark;
-  scroll-behavior: smooth;
+/* Map reado tokens into Tailwind's theme so semantic utilities (bg-surface,
+ * text-faint, …) emit var(--…) directly — same contract as the real app. */
+@theme inline {
+  --color-canvas: var(--bg);
+  --color-surface: var(--bg-elevated);
+  --color-overlay: var(--bg-overlay);
+  --color-line: var(--border);
+  --color-line-strong: var(--border-strong);
+  --color-ink: var(--text);
+  --color-bright: var(--text-bright);
+  --color-muted: var(--text-muted);
+  --color-faint: var(--text-faint);
+  --color-accent: var(--accent);
+  --color-on-accent: var(--accent-contrast);
+  --color-marker: var(--marker);
+  --color-selection: var(--selection);
+
+  --font-sans: var(--font-hanken), -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  --font-mono: var(--font-jetbrains), "SF Mono", ui-monospace, Menlo, monospace;
 }
-@media (prefers-reduced-motion: reduce) {
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
   html {
-    scroll-behavior: auto;
+    background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+  body {
+    margin: 0;
+    color: var(--text);
+    font-family: var(--font-sans);
+  }
+  ::selection {
+    background: var(--selection);
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  /* Thin, quiet scrollbars — chrome recedes (matches the app). */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-strong) transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  *::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border-radius: 999px;
+    border: 3px solid transparent;
+    background-clip: content-box;
   }
 }
-body {
-  background: var(--color-bg);
-  color: var(--color-ink);
-  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-}
-::selection {
-  background: oklch(0.74 0.11 260 / 0.28);
+
+@layer components {
+  /* One shared horizontal rail so the wordmark, the product mock, the headlines
+   * and the footer all align to the same left/right edge across the page. */
+  .gutter {
+    padding-inline: clamp(20px, 4.5vw, 72px);
+  }
+
+  /* Scroll-reveal primitive for the marketing sections. */
+  .reveal {
+    opacity: 0;
+    transform: translateY(34px);
+    transition:
+      opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .reveal.in {
+    opacity: 1;
+    transform: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .reveal {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+  }
+
+  /* Comment-thread message entrance, mirroring the app's quiet motion. */
+  .msg {
+    opacity: 0;
+    transform: translateY(6px);
+    transition:
+      opacity 0.35s ease,
+      transform 0.35s ease;
+  }
+  .msg.in {
+    opacity: 1;
+    transform: none;
+  }
+
+  @keyframes reado-blink {
+    0%,
+    100% {
+      opacity: 0.25;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
 }

@@ -1,0 +1,5 @@
+name = "reado-web"
+compatibility_date = "2025-06-01"
+
+# Static export from `next build` (output: "export") → Cloudflare Pages.
+pages_build_output_dir = "out"

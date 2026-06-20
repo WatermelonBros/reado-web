@@ -1,8 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Static export — prerendered HTML for SEO; deploys to Cloudflare Pages as is.
+  reactStrictMode: true,
+  // Fully static site → export to `out/` for Cloudflare Pages (no Workers runtime).
   output: "export",
+  // Cloudflare serves the assets directly; skip the Next image optimizer.
   images: { unoptimized: true },
 };
 

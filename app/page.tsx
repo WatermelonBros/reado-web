@@ -1,19 +1,17 @@
-import { Nav } from "./components/Nav";
-import { Hero } from "./components/Hero";
-import { Features } from "./components/Features";
-import { Download } from "./components/Download";
-import { Footer } from "./components/Footer";
+import { SmoothScroll } from "@/components/SmoothScroll";
+import { Nav } from "@/components/Nav";
+import { ScrollStory } from "@/components/ScrollStory";
+import { Download } from "@/components/Download";
+import { Footer } from "@/components/Footer";
 
 export default function Home() {
   return (
-    <div id="top">
+    <>
+      <SmoothScroll />
       <Nav />
-      <main>
-        <Hero />
-        <Features />
-        <Download />
-      </main>
+      <ScrollStory />
+      <Download />
       <Footer />
-    </div>
+    </>
   );
 }
