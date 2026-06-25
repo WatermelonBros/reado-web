@@ -75,10 +75,14 @@ export function Download() {
       "reado:releases",
     )
       .then((rel) => {
+        // Always surface every platform. If a specific asset isn't in the latest
+        // release yet (e.g. a partial/in-flight release, or a stale 1h cache that
+        // predates one platform's build), that row falls back to the releases
+        // page instead of vanishing — so macOS never silently disappears.
         const found = TARGETS.map((t) => {
           const a = (rel.assets ?? []).find((x) => t.re.test(x.name));
-          return a ? { ...t, url: a.browser_download_url } : null;
-        }).filter((x): x is Asset => x !== null);
+          return { ...t, url: a ? a.browser_download_url : RELEASES };
+        });
         setAssets(found);
       })
       .catch(() => setAssets([]));
