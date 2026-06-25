@@ -5,6 +5,9 @@ export function Footer() {
     <footer className="border-t border-line py-12 text-faint">
       <div className="gutter flex flex-wrap items-center justify-between gap-4 text-sm">
         <img src="/icon.png" alt="Reado" width={32} height={32} className="h-8 w-8 rounded-lg" />
+        <a href="/roadmap" className="text-muted transition-colors hover:text-ink">
+          Roadmap
+        </a>
         <span>
           © {new Date().getFullYear()}{" "}
           <a href={STUDIO} target="_blank" rel="noopener" className="text-muted hover:text-ink">

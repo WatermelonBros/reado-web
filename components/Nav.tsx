@@ -33,7 +33,7 @@ export function Nav() {
       }
     >
       <div className="gutter flex items-center justify-between py-3.5">
-        <a href="#top" className="flex items-center gap-3" aria-label="Reado — home">
+        <a href="/" className="flex items-center gap-3" aria-label="Reado — home">
           <img
             src="/icon.png"
             alt=""
@@ -46,6 +46,12 @@ export function Nav() {
           </span>
         </a>
         <div className="flex items-center gap-1.5">
+          <a
+            href="/roadmap"
+            className="hidden rounded-lg px-3 py-2 text-sm font-medium text-muted transition-colors hover:bg-surface hover:text-ink sm:block"
+          >
+            Roadmap
+          </a>
           <a
             href={GITHUB}
             target="_blank"
