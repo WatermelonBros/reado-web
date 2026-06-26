@@ -30,8 +30,8 @@ export function ScrollToNext() {
     let touchY = 0;
 
     const NEEDED = 1300; // px of extra downward intent to fill (a longer pull)
-    const DRAIN_SECONDS = 0.55; // empties in ~0.55s once you stop
-    const IDLE_MS = 130; // grace before draining starts
+    const DRAIN_SECONDS = 0.16; // snaps back to empty fast once you stop
+    const IDLE_MS = 70; // brief grace before draining starts
 
     const atBottom = () =>
       window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4;
