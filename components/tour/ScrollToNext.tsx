@@ -19,19 +19,19 @@ export function ScrollToNext() {
   useEffect(() => {
     router.prefetch("/roadmap");
 
-    // `target` accrues from over-scroll intent and drains when you stop; `value`
-    // eases toward it every frame for a fluid fill/empty (no per-event jumps).
+    // Tug-of-war: the bar drains EVERY frame; downward over-scroll pushes it back
+    // up. So it fills only while you keep pulling and empties the instant you stop
+    // — robust to trackpad momentum (which keeps firing wheel events after you let
+    // go). `value` eases toward `target` for a fluid, jump-free motion.
     let target = 0;
     let value = 0;
-    let lastInput = 0;
     let lastFrame = 0;
     let raf = 0;
     let navigated = false;
     let touchY = 0;
 
-    const NEEDED = 1300; // px of extra downward intent to fill (a longer pull)
-    const DRAIN_PER_SEC = 0.2; // visible, steady drain: ~20% per second once you stop
-    const IDLE_MS = 70; // brief grace before draining starts
+    const NEEDED = 900; // px of sustained downward intent to fill against the drain
+    const DRAIN = 2.4; // bar lost per second — fast empty when you stop pulling
 
     const atBottom = () =>
       window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4;
@@ -45,22 +45,19 @@ export function ScrollToNext() {
     const tick = (t: number) => {
       const dt = lastFrame ? Math.min(0.05, (t - lastFrame) / 1000) : 0;
       lastFrame = t;
-      // Drain the target if there's been no recent scroll intent.
-      if (performance.now() - lastInput > IDLE_MS) {
-        target = Math.max(0, target - dt * DRAIN_PER_SEC);
-      }
-      // Frame-rate-independent ease toward the target.
-      value += (target - value) * Math.min(1, dt * 9);
+      target = Math.max(0, target - dt * DRAIN); // always draining
+      value += (target - value) * Math.min(1, dt * 14);
       render();
       if (value >= 0.99 && !navigated) {
         navigated = true;
         router.push("/roadmap");
       }
-      if (value > 0.001 || target > 0.001) {
+      if (value > 0.002 || target > 0.002) {
         raf = requestAnimationFrame(tick);
       } else {
         raf = 0;
         lastFrame = 0;
+        target = 0;
         value = 0;
         render();
       }
@@ -72,13 +69,8 @@ export function ScrollToNext() {
       }
     };
     const intent = (px: number) => {
-      if (!atBottom()) {
-        target = 0;
-        ensure();
-        return;
-      }
-      target = Math.max(0, Math.min(1, target + px / NEEDED));
-      lastInput = performance.now();
+      if (px <= 0 || !atBottom()) return; // only downward over-scroll fills
+      target = Math.min(1, target + px / NEEDED);
       ensure();
     };
 
