@@ -19,35 +19,70 @@ export function ScrollToNext() {
   useEffect(() => {
     router.prefetch("/roadmap");
 
-    let progress = 0;
+    // `target` accrues from over-scroll intent and drains when you stop; `value`
+    // eases toward it every frame for a fluid fill/empty (no per-event jumps).
+    let target = 0;
+    let value = 0;
+    let lastInput = 0;
+    let lastFrame = 0;
+    let raf = 0;
     let navigated = false;
     let touchY = 0;
-    const NEEDED = 640; // px of extra downward intent to fill (a small flick)
+
+    const NEEDED = 1300; // px of extra downward intent to fill (a longer pull)
+    const DRAIN_SECONDS = 0.55; // empties in ~0.55s once you stop
+    const IDLE_MS = 130; // grace before draining starts
 
     const atBottom = () =>
       window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4;
 
     const render = () => {
-      if (barRef.current) barRef.current.style.transform = `scaleX(${progress})`;
-      if (pctRef.current) pctRef.current.textContent = `${Math.round(progress * 100)}%`;
-      if (hintRef.current) hintRef.current.style.opacity = progress > 0.02 ? "1" : "0";
+      if (barRef.current) barRef.current.style.transform = `scaleX(${value})`;
+      if (pctRef.current) pctRef.current.textContent = `${Math.round(value * 100)}%`;
+      if (hintRef.current) hintRef.current.style.opacity = value > 0.02 ? "1" : "0";
     };
-    const set = (v: number) => {
-      progress = Math.max(0, Math.min(1, v));
+
+    const tick = (t: number) => {
+      const dt = lastFrame ? Math.min(0.05, (t - lastFrame) / 1000) : 0;
+      lastFrame = t;
+      // Drain the target if there's been no recent scroll intent.
+      if (performance.now() - lastInput > IDLE_MS) {
+        target = Math.max(0, target - dt / DRAIN_SECONDS);
+      }
+      // Frame-rate-independent ease toward the target.
+      value += (target - value) * Math.min(1, dt * 9);
       render();
-      if (progress >= 1 && !navigated) {
+      if (value >= 0.99 && !navigated) {
         navigated = true;
         router.push("/roadmap");
       }
+      if (value > 0.001 || target > 0.001) {
+        raf = requestAnimationFrame(tick);
+      } else {
+        raf = 0;
+        lastFrame = 0;
+        value = 0;
+        render();
+      }
     };
-
-    const onWheel = (e: WheelEvent) => {
+    const ensure = () => {
+      if (!raf) {
+        lastFrame = 0;
+        raf = requestAnimationFrame(tick);
+      }
+    };
+    const intent = (px: number) => {
       if (!atBottom()) {
-        if (progress > 0) set(0);
+        target = 0;
+        ensure();
         return;
       }
-      set(progress + e.deltaY / NEEDED);
+      target = Math.max(0, Math.min(1, target + px / NEEDED));
+      lastInput = performance.now();
+      ensure();
     };
+
+    const onWheel = (e: WheelEvent) => intent(e.deltaY);
     const onTouchStart = (e: TouchEvent) => {
       touchY = e.touches[0]?.clientY ?? 0;
     };
@@ -55,11 +90,7 @@ export function ScrollToNext() {
       const y = e.touches[0]?.clientY ?? touchY;
       const dy = touchY - y; // dragging up (scroll-down intent) is positive
       touchY = y;
-      if (!atBottom()) {
-        if (progress > 0) set(0);
-        return;
-      }
-      set(progress + dy / (NEEDED * 0.6));
+      intent(dy * 1.6);
     };
 
     window.addEventListener("wheel", onWheel, { passive: true });
@@ -69,6 +100,7 @@ export function ScrollToNext() {
       window.removeEventListener("wheel", onWheel);
       window.removeEventListener("touchstart", onTouchStart);
       window.removeEventListener("touchmove", onTouchMove);
+      if (raf) cancelAnimationFrame(raf);
     };
   }, [router]);
 
