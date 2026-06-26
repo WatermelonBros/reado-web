@@ -81,8 +81,8 @@ interface Beat {
 const BEATS: Beat[] = [
   {
     caption: {
-      title: "A review, start to finish",
-      body: "This is the real Reado — reading the code you didn't write. Scroll to watch a full guided review play out.",
+      title: "A calm place to read — and review — code.",
+      body: "Reado is a read-first IDE: you review with an AI pair and your agent commits the fixes. Scroll to watch a full guided review play out.",
     },
     state: { tool: "files", file: "cart.ts", review: { phase: "empty" } },
   },
@@ -452,9 +452,17 @@ export function WorkflowTour() {
           {/* Caption — fluid type (matches the roadmap), opacity-only crossfade */}
           <div className="order-2 min-w-0 lg:order-1">
             <div key={beat} className="reveal-cap">
-              <h2 className="text-balance text-[clamp(30px,3.6vw,60px)] font-semibold leading-[0.98] tracking-[-0.03em] text-bright">
-                {current.caption.title}
-              </h2>
+              {/* The first beat is the page's <h1> (it's what SSR renders, so it's
+                  the document's main heading for SEO); later beats are <h2>. */}
+              {beat === 0 ? (
+                <h1 className="text-balance text-[clamp(30px,3.6vw,60px)] font-semibold leading-[0.98] tracking-[-0.03em] text-bright">
+                  {current.caption.title}
+                </h1>
+              ) : (
+                <h2 className="text-balance text-[clamp(30px,3.6vw,60px)] font-semibold leading-[0.98] tracking-[-0.03em] text-bright">
+                  {current.caption.title}
+                </h2>
+              )}
               <p className="mt-5 max-w-[44ch] text-pretty text-[clamp(16px,1.5vw,20px)] leading-[1.55] text-muted">
                 {current.caption.body}
               </p>
