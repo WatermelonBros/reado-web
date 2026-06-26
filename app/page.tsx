@@ -1,6 +1,6 @@
 import { SmoothScroll } from "@/components/SmoothScroll";
 import { Nav } from "@/components/Nav";
-import { ScrollStory } from "@/components/ScrollStory";
+import { WorkflowTour } from "@/components/tour/WorkflowTour";
 import { Download } from "@/components/Download";
 import { Footer } from "@/components/Footer";
 
@@ -9,7 +9,7 @@ export default function Home() {
     <>
       <SmoothScroll />
       <Nav />
-      <ScrollStory />
+      <WorkflowTour />
       <Download />
       <Footer />
     </>

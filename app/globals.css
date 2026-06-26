@@ -179,3 +179,23 @@
     }
   }
 }
+
+/* Workflow tour — caption + phone reveals (transform/opacity only, 60fps). */
+.reveal-cap {
+  animation: cap-in 0.5s var(--ease, cubic-bezier(0.2, 0, 0, 1)) both;
+}
+@keyframes cap-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+.reveal-phone {
+  animation: phone-in 0.6s cubic-bezier(0.2, 0, 0, 1) both;
+}
+@keyframes phone-in {
+  from {
+    opacity: 0;
+    transform: translateX(48px) translateY(8px);
+  }
+}
