@@ -30,7 +30,7 @@ export function ScrollToNext() {
     let touchY = 0;
 
     const NEEDED = 1300; // px of extra downward intent to fill (a longer pull)
-    const DRAIN_SECONDS = 0.16; // snaps back to empty fast once you stop
+    const DRAIN_PER_SEC = 0.2; // visible, steady drain: ~20% per second once you stop
     const IDLE_MS = 70; // brief grace before draining starts
 
     const atBottom = () =>
@@ -47,7 +47,7 @@ export function ScrollToNext() {
       lastFrame = t;
       // Drain the target if there's been no recent scroll intent.
       if (performance.now() - lastInput > IDLE_MS) {
-        target = Math.max(0, target - dt / DRAIN_SECONDS);
+        target = Math.max(0, target - dt * DRAIN_PER_SEC);
       }
       // Frame-rate-independent ease toward the target.
       value += (target - value) * Math.min(1, dt * 9);
