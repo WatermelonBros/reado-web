@@ -70,26 +70,34 @@ const HORIZONS: Horizon[] = [
         title: "Knowledge graph, LSP, git, MCP & extensions",
         body: "See a codebase's shape at a glance, with real language servers, git review, an MCP server, and an extensions marketplace.",
       },
+      {
+        title: "Guided Pair Review",
+        body: "The agent proposes a route and reviews file by file, drafting comments anchored to lines; you approve, edit or discard each one. A second agent can challenge the findings — nothing is final until you say so.",
+      },
+      {
+        title: "Reado Anywhere & pull-request review",
+        body: "Pair your phone over the network to review on the go. Open a GitHub or GitLab PR, pull its existing threads into the inbox, and submit a batched review with a verdict — confirmed tasks flow into an async resolve loop that pings you when the agent is done.",
+      },
     ],
   },
   {
     tag: "02 — Next",
     heading: "What we're building.",
-    lede: "Three things that don't exist yet — and that an AI agent can't just do for you. They turn Reado into the review surface for AI-written code, wherever it's written.",
+    lede: "The review system just landed. Next we widen where it reaches and how hard the AI checks the AI.",
     status: "building",
     statusLabel: "in progress",
     items: [
       {
-        title: "Reado Anywhere",
-        body: "Review from your phone. Scan a QR code to pair over your local network — no account, no backend. On a VPN it reaches your desk from anywhere. Read the diff, leave comments, approve, kick off the agent.",
+        title: "More forges",
+        body: "The pull-request adapter is a provider registry: GitHub and GitLab ship today. Bitbucket, Gitea and Azure DevOps slot in next — and any repo without an adapter still reviews locally.",
       },
       {
-        title: "Pull-request review",
-        body: "Review a whole branch or GitHub PR the read-first way: walk it file by file, leave anchored comments, and send the notes back as PR review comments.",
+        title: "Complete thread sync",
+        body: "Full pagination for large PRs/MRs, and clear signals when a host sync is partial — so a review that says “complete” really is.",
       },
       {
-        title: "The async review loop",
-        body: "Queue the comments and let your agent work — with its own subagents. Reado tracks the state and pings you, on your phone, when there's something to read and approve. The agent does the work; Reado holds the human loop.",
+        title: "Deeper second-agent review",
+        body: "Stronger contrarian passes and review panels, so the AI challenges the AI — false positives caught and blind spots surfaced before they reach you.",
       },
     ],
   },

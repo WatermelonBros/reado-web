@@ -312,12 +312,32 @@ const BEATS: Beat[] = [
   },
 ];
 
+// The IDE is authored at this fixed "design" size and scaled to fill the column,
+// so it stays pixel-faithful but uses the whole screen (big and crisp on 4K).
+const DESIGN_W = 1200;
+const DESIGN_H = 750;
+
 export function WorkflowTour() {
   const trackRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
+  const fitRef = useRef<HTMLDivElement>(null);
   const cursorRef = useRef<HTMLDivElement>(null);
   const [beat, setBeat] = useState(0);
   const [clicking, setClicking] = useState(false);
+  const [scale, setScale] = useState(1);
+
+  // Scale the IDE to fill its slot (width- or height-bound, whichever is tighter).
+  useEffect(() => {
+    const el = fitRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => {
+      const w = el.clientWidth;
+      const h = el.clientHeight;
+      if (w && h) setScale(Math.min(w / DESIGN_W, h / DESIGN_H));
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   useEffect(() => {
     const N = BEATS.length;
@@ -384,35 +404,45 @@ export function WorkflowTour() {
   return (
     <section ref={trackRef} className="relative" style={{ height: `${BEATS.length * 100}vh` }}>
       <div className="sticky top-0 flex h-screen items-center overflow-hidden">
-        <div className="mx-auto grid w-full max-w-[1240px] grid-cols-1 items-center gap-8 px-6 lg:grid-cols-[minmax(260px,360px)_1fr]">
-          {/* Caption */}
-          <div key={beat} className="reveal-cap order-2 lg:order-1">
-            <h2 className="text-balance text-3xl font-semibold tracking-tight text-bright sm:text-4xl">
-              {current.caption.title}
-            </h2>
-            <p className="mt-4 max-w-md text-pretty text-base leading-relaxed text-muted">
-              {current.caption.body}
-            </p>
-            <div className="mt-6 flex gap-1.5">
+        <div className="mx-auto grid w-full max-w-[min(1760px,94vw)] grid-cols-1 items-center gap-x-12 gap-y-6 px-[clamp(20px,4vw,64px)] lg:grid-cols-[minmax(280px,28%)_1fr]">
+          {/* Caption — fluid type (matches the roadmap), opacity-only crossfade */}
+          <div className="order-2 min-w-0 lg:order-1">
+            <div key={beat} className="reveal-cap">
+              <h2 className="text-balance text-[clamp(30px,3.6vw,60px)] font-semibold leading-[0.98] tracking-[-0.03em] text-bright">
+                {current.caption.title}
+              </h2>
+              <p className="mt-5 max-w-[44ch] text-pretty text-[clamp(16px,1.5vw,20px)] leading-[1.55] text-muted">
+                {current.caption.body}
+              </p>
+            </div>
+            {/* Stepper stays put (no per-beat re-animation) */}
+            <div className="mt-8 flex gap-1.5">
               {BEATS.map((_, i) => (
                 <span
                   key={i}
                   className={`h-1 rounded-full transition-all duration-300 ${
-                    i === beat ? "w-6 bg-accent" : "w-1.5 bg-line-strong"
+                    i === beat ? "w-7 bg-accent" : "w-1.5 bg-line-strong"
                   }`}
                 />
               ))}
             </div>
           </div>
 
-          {/* The pinned IDE stage */}
-          <div className="order-1 lg:order-2">
-            <div
-              ref={stageRef}
-              className="relative mx-auto aspect-[16/10] w-full max-w-[820px]"
-            >
-              <ReadoIde state={current.state} />
-              {current.phone && <PhoneAnywhere />}
+          {/* The pinned IDE stage — scaled to fill */}
+          <div className="order-1 min-w-0 lg:order-2">
+            <div ref={fitRef} className="relative mx-auto h-[min(80vh,820px)] w-full">
+              <div
+                ref={stageRef}
+                className="absolute left-1/2 top-1/2"
+                style={{
+                  width: DESIGN_W,
+                  height: DESIGN_H,
+                  transform: `translate(-50%, -50%) scale(${scale})`,
+                }}
+              >
+                <ReadoIde state={current.state} />
+                {current.phone && <PhoneAnywhere />}
+              </div>
             </div>
           </div>
         </div>
