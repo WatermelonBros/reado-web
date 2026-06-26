@@ -14,7 +14,7 @@ const jetbrains = JetBrains_Mono({
   display: "swap",
 });
 
-const SITE = "https://reado.app";
+const SITE = "https://reado.watermelon-studio.it";
 const TITLE = "Reado — a calm place to read code";
 const DESCRIPTION =
   "A read-first code IDE. You read and leave durable, anchored comments; Claude Code and Codex review and commit the fixes. Inverted code review for the AI era.";

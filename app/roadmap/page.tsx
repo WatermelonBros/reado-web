@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/roadmap" },
   openGraph: {
     type: "website",
-    url: "https://reado.app/roadmap",
+    url: "https://reado.watermelon-studio.it/roadmap",
     title: "Reado — Roadmap",
     description: "What's shipped, what's next, and the bets we're exploring.",
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "Reado" }],

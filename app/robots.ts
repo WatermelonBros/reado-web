@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 
 export const dynamic = "force-static";
 
-const SITE = "https://reado.app";
+const SITE = "https://reado.watermelon-studio.it";
 
 export default function robots(): MetadataRoute.Robots {
   return {
