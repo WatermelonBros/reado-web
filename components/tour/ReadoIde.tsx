@@ -223,7 +223,6 @@ function ReviewPanel({ review }: { review: ReviewState }) {
   const { phase } = review;
   const reviewed = review.reviewed ?? 0;
   const total = review.total ?? 0;
-  const open = (review.proposals ?? []).filter((p) => p.state === "proposed");
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
@@ -309,9 +308,7 @@ function ReviewPanel({ review }: { review: ReviewState }) {
                 <div className="mt-2 flex flex-wrap gap-1.5">
                   <Chip>Mark reviewed</Chip>
                   <Chip>Skip</Chip>
-                  {open.length === 0 && (review.proposals?.length ?? 0) > 0 && (
-                    <Chip act="second">Second opinion</Chip>
-                  )}
+                  {(review.proposals?.length ?? 0) > 0 && <Chip act="second">Second opinion</Chip>}
                 </div>
               </div>
             </section>

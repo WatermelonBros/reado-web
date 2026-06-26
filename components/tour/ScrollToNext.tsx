@@ -1,10 +1,9 @@
 "use client";
 
 /**
- * "Keep scrolling" → the roadmap (lusion-style). Sits after the footer: as you
- * scroll past it a bar fills, and at the end we navigate to /roadmap. The bar is
- * driven by transform: scaleX only (60fps); /roadmap is prefetched for an instant
- * transition.
+ * A compact "scroll to next page" strip under the footer (lusion-style): a short
+ * over-scroll fills the bar and we navigate to /roadmap — no long scrolling
+ * needed. The bar is transform: scaleX only (60fps); /roadmap is prefetched.
  */
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
@@ -24,6 +23,7 @@ export function ScrollToNext() {
     let navigated = false;
     const st = ScrollTrigger.create({
       trigger: sectionRef.current,
+      // A short range: the bar fills with just a flick past the footer.
       start: "top bottom",
       end: "bottom bottom",
       scrub: true,
@@ -40,26 +40,30 @@ export function ScrollToNext() {
     return () => st.kill();
   }, [router]);
 
+  // ~55vh of travel = a small flick fills it; the strip stays pinned at the
+  // bottom while it does, so it reads like part of the footer.
   return (
-    <section ref={sectionRef} className="relative h-[160vh] border-t border-line">
-      <div className="sticky top-0 flex h-screen flex-col items-center justify-center gap-6 px-6 text-center">
-        <p className="font-mono text-[12px] uppercase tracking-[0.2em] text-faint">Keep scrolling</p>
-        <p className="text-[clamp(28px,4vw,56px)] font-semibold leading-none tracking-[-0.03em] text-bright">
-          The roadmap →
-        </p>
-        <div className="mt-2 flex w-[min(460px,72vw)] items-center gap-3">
-          <div className="h-[3px] flex-1 overflow-hidden rounded-full bg-line-strong/60">
-            <div
-              ref={barRef}
-              className="h-full w-full origin-left rounded-full bg-accent will-change-transform"
-              style={{ transform: "scaleX(0)" }}
-            />
-          </div>
-          <span ref={pctRef} className="w-9 text-right font-mono text-[11px] tabular-nums text-faint">
-            0%
+    <section ref={sectionRef} className="relative h-[55vh]">
+      <div className="sticky bottom-0 border-t border-line bg-canvas">
+        <div className="gutter flex items-center justify-between gap-4 py-5">
+          <span className="font-mono text-[12px] uppercase tracking-[0.18em] text-faint">
+            Scroll to next page
           </span>
+          <div className="flex items-center gap-2 text-muted">
+            <span className="text-[13px] font-medium text-ink">The roadmap</span>
+            <span aria-hidden>→</span>
+            <span ref={pctRef} className="w-8 text-right font-mono text-[11px] tabular-nums text-faint">
+              0%
+            </span>
+          </div>
         </div>
-        <p className="text-[13px] text-muted">Release the scroll to stay — keep going to open the roadmap.</p>
+        <div className="h-[3px] w-full overflow-hidden bg-line-strong/40">
+          <div
+            ref={barRef}
+            className="h-full w-full origin-left bg-accent will-change-transform"
+            style={{ transform: "scaleX(0)" }}
+          />
+        </div>
       </div>
     </section>
   );

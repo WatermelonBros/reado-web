@@ -325,6 +325,18 @@ export function WorkflowTour() {
   const [beat, setBeat] = useState(0);
   const [clicking, setClicking] = useState(false);
   const [scale, setScale] = useState(1);
+  // Touch / small / reduced-motion → autoplay (no scroll-scrub, no fake cursor).
+  const [compact, setCompact] = useState(false);
+
+  useEffect(() => {
+    const mq = matchMedia(
+      "(max-width: 1023px), (pointer: coarse), (prefers-reduced-motion: reduce)",
+    );
+    const sync = () => setCompact(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
 
   // Scale the IDE to fill its slot (width- or height-bound, whichever is tighter).
   useEffect(() => {
@@ -339,9 +351,10 @@ export function WorkflowTour() {
     return () => ro.disconnect();
   }, []);
 
+  // Desktop: scroll-scrub the beats + fly the fake cursor (reversible).
   useEffect(() => {
+    if (compact) return;
     const N = BEATS.length;
-    const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     const centerOf = (sel?: string): { x: number; y: number } | null => {
       if (!sel || !stageRef.current) return null;
@@ -383,11 +396,6 @@ export function WorkflowTour() {
       }
     };
 
-    if (reduced) {
-      setBeat(0);
-      return;
-    }
-
     const st = ScrollTrigger.create({
       trigger: trackRef.current,
       start: "top top",
@@ -397,13 +405,49 @@ export function WorkflowTour() {
     });
     apply(0);
     return () => st.kill();
-  }, []);
+  }, [compact]);
+
+  // Mobile / reduced-motion: autoplay the beats while the tour is on screen.
+  useEffect(() => {
+    if (!compact) return;
+    const el = trackRef.current;
+    if (!el) return;
+    if (cursorRef.current) cursorRef.current.style.opacity = "0";
+    let id: number | null = null;
+    const stop = () => {
+      if (id != null) {
+        clearInterval(id);
+        id = null;
+      }
+    };
+    const start = () => {
+      if (id == null) id = window.setInterval(() => setBeat((b) => (b + 1) % BEATS.length), 2600);
+    };
+    const io = new IntersectionObserver(([e]) => (e.isIntersecting ? start() : stop()), {
+      threshold: 0.25,
+    });
+    io.observe(el);
+    return () => {
+      stop();
+      io.disconnect();
+    };
+  }, [compact]);
 
   const current = BEATS[beat];
 
   return (
-    <section ref={trackRef} className="relative" style={{ height: `${BEATS.length * 100}vh` }}>
-      <div className="sticky top-0 flex h-screen items-center overflow-hidden">
+    <section
+      ref={trackRef}
+      className="relative"
+      style={compact ? undefined : { height: `${BEATS.length * 100}vh` }}
+    >
+      <div
+        className={
+          compact
+            ? "flex min-h-[100svh] items-center overflow-hidden py-16"
+            : "sticky top-0 flex h-screen items-center overflow-hidden"
+        }
+      >
         <div className="mx-auto grid w-full max-w-[min(1760px,94vw)] grid-cols-1 items-center gap-x-12 gap-y-6 px-[clamp(20px,4vw,64px)] lg:grid-cols-[minmax(280px,28%)_1fr]">
           {/* Caption — fluid type (matches the roadmap), opacity-only crossfade */}
           <div className="order-2 min-w-0 lg:order-1">
@@ -430,7 +474,7 @@ export function WorkflowTour() {
 
           {/* The pinned IDE stage — scaled to fill */}
           <div className="order-1 min-w-0 lg:order-2">
-            <div ref={fitRef} className="relative mx-auto h-[min(80vh,820px)] w-full">
+            <div ref={fitRef} className="relative mx-auto h-[min(58vh,480px)] w-full lg:h-[min(80vh,820px)]">
               <div
                 ref={stageRef}
                 className="absolute left-1/2 top-1/2"
@@ -448,27 +492,29 @@ export function WorkflowTour() {
         </div>
       </div>
 
-      {/* Fake cursor (fixed, moved via transform only) */}
-      <div
-        ref={cursorRef}
-        className="pointer-events-none fixed left-0 top-0 z-50 -ml-2 -mt-2 opacity-0 will-change-transform"
-        aria-hidden="true"
-      >
-        <div className="relative">
-          <svg width="22" height="22" viewBox="0 0 24 24" className="drop-shadow">
-            <path
-              d="M5 3l14 7-6 1.6L9.5 19z"
-              fill="white"
-              stroke="black"
-              strokeWidth="1.2"
-              strokeLinejoin="round"
-            />
-          </svg>
-          {clicking && (
-            <span className="absolute left-1 top-1 h-6 w-6 -translate-x-1/2 -translate-y-1/2 animate-ping rounded-full bg-accent/50" />
-          )}
+      {/* Fake cursor (desktop only; fixed, moved via transform only) */}
+      {!compact && (
+        <div
+          ref={cursorRef}
+          className="pointer-events-none fixed left-0 top-0 z-50 -ml-2 -mt-2 opacity-0 will-change-transform"
+          aria-hidden="true"
+        >
+          <div className="relative">
+            <svg width="22" height="22" viewBox="0 0 24 24" className="drop-shadow">
+              <path
+                d="M5 3l14 7-6 1.6L9.5 19z"
+                fill="white"
+                stroke="black"
+                strokeWidth="1.2"
+                strokeLinejoin="round"
+              />
+            </svg>
+            {clicking && (
+              <span className="absolute left-1 top-1 h-6 w-6 -translate-x-1/2 -translate-y-1/2 animate-ping rounded-full bg-accent/50" />
+            )}
+          </div>
         </div>
-      </div>
+      )}
     </section>
   );
 }
