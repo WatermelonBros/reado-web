@@ -1,0 +1,6 @@
+# pnpm 11 asks explicitly which dependencies may run install scripts. sharp 0.33 ships its native
+# binaries as per-platform optional dependencies rather than compiling on install, so its script is
+# not needed — and pnpm 10 blocked it by default too, which is what the current lockfile was built
+# against. Left false to keep that behaviour.
+allowBuilds:
+  sharp: false
