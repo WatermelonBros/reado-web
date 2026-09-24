@@ -40,3 +40,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .reado/
+
+# Impeccable review captures (contain test data) and local tooling config.
+.impeccable/review/
+.mcp.json

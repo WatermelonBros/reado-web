@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Reveal } from "./Reveal";
+import { Tag } from "./ui/Tag";
 import { GITHUB, RELEASES } from "./links";
 
 type OS = "mac" | "win" | "linux";
@@ -165,9 +166,7 @@ export function Download() {
                     {r.label}
                   </span>
                   {r.mine && (
-                    <span className="rounded-full border border-marker/40 px-2.5 py-0.5 font-mono text-[11px] tracking-wide text-marker">
-                      for you
-                    </span>
+                    <Tag>for you</Tag>
                   )}
                 </span>
                 <span className="hidden font-mono text-sm text-faint sm:block">
