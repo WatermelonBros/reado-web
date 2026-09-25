@@ -4,6 +4,7 @@ import { SmoothScroll } from "@/components/SmoothScroll";
 import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
 import { Reveal } from "@/components/Reveal";
+import { ButtonLink } from "@/components/ui/Button";
 import { GITHUB, ISSUES, DISCUSSIONS } from "@/components/links";
 
 export const metadata: Metadata = {
@@ -158,22 +159,20 @@ export default function RoadmapPage() {
 
           <Reveal delay={120}>
             <div className="mt-9 flex flex-wrap items-center gap-3">
-              <a
+              <ButtonLink
                 href={DISCUSSIONS}
                 target="_blank"
                 rel="noopener"
-                className="rounded-full bg-accent px-5 py-2.5 text-[15px] font-semibold text-on-accent transition-[filter] hover:brightness-110"
-              >
+                              >
                 Help shape it →
-              </a>
-              <a
+              </ButtonLink>
+              <ButtonLink variant="secondary"
                 href={ISSUES}
                 target="_blank"
                 rel="noopener"
-                className="rounded-full border border-line-strong px-5 py-2.5 text-[15px] font-semibold text-ink transition-colors hover:border-marker/60"
-              >
+                              >
                 Request a feature
-              </a>
+              </ButtonLink>
             </div>
           </Reveal>
         </section>
@@ -246,22 +245,20 @@ export default function RoadmapPage() {
               thumbs-up, or tell us what your review workflow actually needs.
             </p>
             <div className="mt-9 flex flex-wrap items-center gap-3">
-              <a
+              <ButtonLink
                 href={DISCUSSIONS}
                 target="_blank"
                 rel="noopener"
-                className="rounded-full bg-accent px-5 py-2.5 text-[15px] font-semibold text-on-accent transition-[filter] hover:brightness-110"
-              >
+                              >
                 Start a discussion →
-              </a>
-              <a
+              </ButtonLink>
+              <ButtonLink variant="secondary"
                 href={GITHUB}
                 target="_blank"
                 rel="noopener"
-                className="rounded-full border border-line-strong px-5 py-2.5 text-[15px] font-semibold text-ink transition-colors hover:border-marker/60"
-              >
+                              >
                 Reado on GitHub
-              </a>
+              </ButtonLink>
             </div>
           </Reveal>
         </section>

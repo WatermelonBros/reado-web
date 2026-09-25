@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { GITHUB, RELEASES, DISCORD } from "./links";
+import { buttonClass } from "./ui/Button";
 
 const GitHubMark = () => (
   <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor" aria-hidden>
@@ -74,7 +75,7 @@ export function Nav() {
           </a>
           <a
             href={RELEASES}
-            className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-on-accent transition-[filter] hover:brightness-110"
+            className={buttonClass("primary", "px-4 py-2 text-sm")}
           >
             Download
           </a>
