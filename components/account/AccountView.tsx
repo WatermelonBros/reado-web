@@ -49,6 +49,7 @@ export function AccountView() {
   const [sessions, setSessions] = useState<SessionRow[]>([]);
   const [linked, setLinked] = useState<string[]>([]);
   const [forges, setForges] = useState<ForgeId[]>([]);
+  const [orgs, setOrgs] = useState<{ id: string; name: string; role: string }[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   async function load() {
@@ -59,11 +60,13 @@ export function AccountView() {
         return;
       }
       setMe(s);
-      const [rows, accounts, providers] = await Promise.all([
+      const [rows, accounts, providers, mine] = await Promise.all([
         get<SessionRow[]>("/api/auth/list-sessions"),
         get<{ providerId: string }[]>("/api/auth/list-accounts"),
         get<Record<ForgeId, boolean>>("/v1/auth/providers"),
+        get<{ id: string; name: string; role: string }[]>("/v1/orgs/mine").catch(() => []),
       ]);
+      setOrgs(mine);
       setSessions(rows);
       setLinked(accounts.map((a) => a.providerId));
       setForges(FORGES.map((f) => f.id).filter((id) => providers[id]));
@@ -119,6 +122,36 @@ export function AccountView() {
       {me && (
         <>
           <h2 className="text-[clamp(22px,2.4vw,30px)] font-semibold tracking-[-0.02em] text-bright">
+            Your organizations
+          </h2>
+          <ul className="mt-5 border-b border-line">
+            {orgs.map((o) => (
+              <li
+                key={o.id}
+                className="flex items-center justify-between gap-4 border-t border-line py-[clamp(14px,2vh,22px)]"
+              >
+                <span className="flex min-w-0 items-center gap-3 text-[clamp(18px,1.8vw,22px)] font-semibold tracking-[-0.01em] text-ink">
+                  <span className="truncate">{o.name}</span>
+                  <Tag tone="quiet">{o.role}</Tag>
+                </span>
+                <TextLink href={`/account/org?id=${encodeURIComponent(o.id)}`} className="flex-none">
+                  Manage
+                </TextLink>
+              </li>
+            ))}
+            <li className="flex items-center justify-between gap-4 border-t border-line py-[clamp(14px,2vh,22px)]">
+              <span className="text-[15px] text-muted">
+                {orgs.length
+                  ? "Start another, or join one your forge says you belong to."
+                  : "Share comments and assign tasks with your team."}
+              </span>
+              <TextLink href="/account/org" className="flex-none">
+                {orgs.length ? "New organization" : "Create an organization"}
+              </TextLink>
+            </li>
+          </ul>
+
+          <h2 className="mt-14 text-[clamp(22px,2.4vw,30px)] font-semibold tracking-[-0.02em] text-bright">
             Where you&rsquo;re signed in
           </h2>
           <ul className="mt-5 border-b border-line">
