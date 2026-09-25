@@ -4,9 +4,10 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Display } from "@/components/ui/Display";
 import { Tag } from "@/components/ui/Tag";
-import { TextButton } from "@/components/ui/TextLink";
+import { TextButton, TextLink } from "@/components/ui/TextLink";
 import { ApiError, get, initials, post, type SessionUser } from "./api";
 import { AccountLayout, Lede } from "./AccountLayout";
+import { FORGES, type ForgeId, forgeOAuth } from "./forges";
 
 interface SessionRow {
   token: string;
@@ -46,6 +47,8 @@ function ago(iso: string): string {
 export function AccountView() {
   const [me, setMe] = useState<{ user: SessionUser; session: { token: string } } | null>(null);
   const [sessions, setSessions] = useState<SessionRow[]>([]);
+  const [linked, setLinked] = useState<string[]>([]);
+  const [forges, setForges] = useState<ForgeId[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   async function load() {
@@ -56,7 +59,14 @@ export function AccountView() {
         return;
       }
       setMe(s);
-      setSessions(await get<SessionRow[]>("/api/auth/list-sessions"));
+      const [rows, accounts, providers] = await Promise.all([
+        get<SessionRow[]>("/api/auth/list-sessions"),
+        get<{ providerId: string }[]>("/api/auth/list-accounts"),
+        get<Record<ForgeId, boolean>>("/v1/auth/providers"),
+      ]);
+      setSessions(rows);
+      setLinked(accounts.map((a) => a.providerId));
+      setForges(FORGES.map((f) => f.id).filter((id) => providers[id]));
     } catch (e) {
       if (e instanceof ApiError && e.status === 401) location.href = "/sign-in";
       else setError("Can't reach the Reado service right now. Try again in a moment.");
@@ -150,9 +160,61 @@ export function AccountView() {
               );
             })}
           </ul>
+          <h2 className="mt-14 text-[clamp(22px,2.4vw,30px)] font-semibold tracking-[-0.02em] text-bright">
+            How you sign in
+          </h2>
+          <ul className="mt-5 border-b border-line">
+            {linked.includes("credential") && (
+              <li className="flex items-center justify-between gap-4 border-t border-line py-[clamp(14px,2vh,22px)]">
+                <span className="text-[clamp(18px,1.8vw,22px)] font-semibold tracking-[-0.01em] text-ink">
+                  Email and password
+                </span>
+              </li>
+            )}
+            {FORGES.filter((f) => forges.includes(f.id) || linked.includes(f.id)).map(({ id, label, Mark }) => (
+              <li
+                key={id}
+                className="flex items-center justify-between gap-4 border-t border-line py-[clamp(14px,2vh,22px)]"
+              >
+                <span className="flex items-center gap-3 text-[clamp(18px,1.8vw,22px)] font-semibold tracking-[-0.01em] text-ink">
+                  <Mark />
+                  {label}
+                  {!linked.includes(id) && <span className="text-sm font-normal text-muted">not linked</span>}
+                </span>
+                {linked.includes(id) ? (
+                  linked.length > 1 && (
+                    <TextButton
+                      onClick={async () => {
+                        await post("/api/auth/unlink-account", { providerId: id }).catch(() =>
+                          setError(`Couldn't unlink ${label}. Try again.`),
+                        );
+                        void load();
+                      }}
+                    >
+                      Unlink
+                    </TextButton>
+                  )
+                ) : (
+                  <TextButton
+                    onClick={() => forgeOAuth(id, "/account", true).catch((e) => setError((e as Error).message))}
+                  >
+                    Link
+                  </TextButton>
+                )}
+              </li>
+            ))}
+          </ul>
+          <p className="mt-5 text-[15px] text-muted">
+            A linked GitHub, GitLab or Bitbucket account is also how Reado knows which of your{" "}
+            <TextLink href="/account/org" className="text-[15px]">
+              organizations
+            </TextLink>{" "}
+            you belong to.
+          </p>
+
           <Button
             variant="secondary"
-            className="mt-8"
+            className="mt-14"
             onClick={async () => {
               await post("/api/auth/sign-out").catch(() => {});
               location.href = "/sign-in";

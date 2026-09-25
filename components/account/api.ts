@@ -33,9 +33,14 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
 export const get = <T>(path: string) => request<T>("GET", path);
 export const post = <T>(path: string, body: unknown = {}) => request<T>("POST", path, body);
 
-/** Where to go once signed in: back to the desktop app's flow, or the account page. */
-export const nextAfterSignIn = (flow: string | null) =>
-  flow ? `${API}/v1/auth/desktop/complete?flow=${encodeURIComponent(flow)}` : "/account";
+/** Where to go once signed in: back to the desktop app's flow, a page of this site
+ *  (`?next=`, same-origin paths only), or the account page. */
+export const nextAfterSignIn = (flow: string | null, next: string | null = null) =>
+  flow
+    ? `${API}/v1/auth/desktop/complete?flow=${encodeURIComponent(flow)}`
+    : next?.startsWith("/") && !next.startsWith("//")
+      ? next
+      : "/account";
 
 export interface SessionUser {
   id: string;
