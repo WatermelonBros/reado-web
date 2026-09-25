@@ -83,23 +83,19 @@ const HORIZONS: Horizon[] = [
         title: "Reado Anywhere & pull-request review",
         body: "Pair your phone over the network to review on the go. Open a GitHub or GitLab PR, pull its existing threads into the inbox, and submit a batched review with a verdict — confirmed tasks flow into an async resolve loop that pings you when the agent is done.",
       },
+      {
+        title: "Organizations, shared comments and an inbox",
+        body: "Connect your GitHub organization — installing the Reado app is the proof it's yours — and colleagues join on their own. With Reado Pro, comments on its repositories reach every teammate as they're written, and stay local files the agent reads as always. Assign a comment to a teammate or to an agent, see what's waiting for you in one inbox, and hear when something changes.",
+      },
     ],
   },
   {
     tag: "02 — Next",
     heading: "What we're building.",
-    lede: "The account just landed. Next, the team layer on top of it — and a wider reach for the review system.",
+    lede: "The team layer just landed. Next, a wider reach for the review system — and more forges for organizations.",
     status: "building",
     statusLabel: "in progress",
     items: [
-      {
-        title: "Shared comments for teams",
-        body: "Comments on your team's repositories reach every teammate the moment they're written — yours and your agent's alike — and follow the code across branches. They stay local files too, so the agent and offline work are untouched. Part of Reado Pro.",
-      },
-      {
-        title: "Assignments & notifications",
-        body: "Hand a comment to a teammate or to an agent, see everything waiting for you in one inbox, and hear when it's done — on your desktop or your phone.",
-      },
       {
         title: "More forges",
         body: "The pull-request adapter is a provider registry: GitHub and GitLab ship today. Bitbucket, Gitea and Azure DevOps slot in next — and any repo without an adapter still reviews locally.",
