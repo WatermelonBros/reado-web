@@ -45,3 +45,12 @@ export interface SessionUser {
   username?: string;
   plan?: string;
 }
+
+/** Avatar fallback, one letter per word: "Test" → "T", "Matteo Poli" → "MP". */
+export const initials = (name: string) =>
+  name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0]?.toUpperCase())
+    .join("") || "?";

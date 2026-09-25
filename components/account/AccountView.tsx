@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { Display } from "@/components/ui/Display";
 import { Tag } from "@/components/ui/Tag";
 import { TextButton } from "@/components/ui/TextLink";
-import { ApiError, get, post, type SessionUser } from "./api";
+import { ApiError, get, initials, post, type SessionUser } from "./api";
 import { AccountLayout, Lede } from "./AccountLayout";
 
 interface SessionRow {
@@ -41,15 +41,6 @@ function ago(iso: string): string {
   }
   return rtf.format(Math.round(v), "year");
 }
-
-/** One letter per word: "Test" → "T", "Matteo Poli" → "MP". */
-const initials = (name: string) =>
-  name
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((w) => w[0]?.toUpperCase())
-    .join("") || "?";
 
 /** The signed-in account: who you are, your plan, and where you're signed in. */
 export function AccountView() {
