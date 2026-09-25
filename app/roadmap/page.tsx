@@ -76,6 +76,10 @@ const HORIZONS: Horizon[] = [
         body: "The agent proposes a route and reviews file by file, drafting comments anchored to lines; you approve, edit or discard each one. A second agent can challenge the findings — nothing is final until you say so.",
       },
       {
+        title: "A Reado account, and settings that follow you",
+        body: "Sign in from the app with GitHub or email — it's optional, and Reado works fully without it. Turn on sync and your theme, fonts, preferences, shortcuts and extensions are the same on every machine you use. Projects and paths never leave yours.",
+      },
+      {
         title: "Reado Anywhere & pull-request review",
         body: "Pair your phone over the network to review on the go. Open a GitHub or GitLab PR, pull its existing threads into the inbox, and submit a batched review with a verdict — confirmed tasks flow into an async resolve loop that pings you when the agent is done.",
       },
@@ -84,10 +88,18 @@ const HORIZONS: Horizon[] = [
   {
     tag: "02 — Next",
     heading: "What we're building.",
-    lede: "The review system just landed. Next we widen where it reaches and how hard the AI checks the AI.",
+    lede: "The account just landed. Next, the team layer on top of it — and a wider reach for the review system.",
     status: "building",
     statusLabel: "in progress",
     items: [
+      {
+        title: "Shared comments for teams",
+        body: "Comments on your team's repositories reach every teammate the moment they're written — yours and your agent's alike — and follow the code across branches. They stay local files too, so the agent and offline work are untouched. Part of Reado Pro.",
+      },
+      {
+        title: "Assignments & notifications",
+        body: "Hand a comment to a teammate or to an agent, see everything waiting for you in one inbox, and hear when it's done — on your desktop or your phone.",
+      },
       {
         title: "More forges",
         body: "The pull-request adapter is a provider registry: GitHub and GitLab ship today. Bitbucket, Gitea and Azure DevOps slot in next — and any repo without an adapter still reviews locally.",
@@ -105,17 +117,17 @@ const HORIZONS: Horizon[] = [
   {
     tag: "03 — Later",
     heading: "Bets we're exploring.",
-    lede: "Further out, and less certain. The natural extensions once the three above are solid.",
+    lede: "Further out, and less certain. The natural extensions once the team layer is solid.",
     status: "exploring",
     statusLabel: "exploring",
     items: [
       {
-        title: "Reado Anywhere, hosted",
-        body: "A relay with sign-in, so remote review works without setting up a VPN — end-to-end encrypted, the server only forwards.",
+        title: "Reado Anywhere, anywhere",
+        body: "A phone app and a relay, so reviewing from your phone works outside your network without a VPN — end-to-end encrypted; the relay only forwards bytes it can't read.",
       },
       {
-        title: "Live team review",
-        body: "Shared threads already travel via git. The new part: presence, assignments, and notifications — live, across a team.",
+        title: "Pair sessions",
+        body: "Invite teammates into a session, follow whoever is leading by clicking their avatar, and draw on the code to point things out — every mark can become a comment.",
       },
       {
         title: "Self-hosted & SSO",
