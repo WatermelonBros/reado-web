@@ -125,15 +125,9 @@ export function SignInForm({ mode }: { mode: "sign-in" | "sign-up" }) {
         <Field label="Email" name="email" type="email" autoComplete="email" required />
         <Field
           label="Password"
-          hint={
-            signIn ? (
-              <TextLink href="/forgot-password" className="text-[13px]">
-                Forgot password?
-              </TextLink>
-            ) : (
-              "At least 10 characters"
-            )
-          }
+          // "Forgot password?" returns here once the service sends real email;
+          // /forgot-password and /reset-password are built and waiting.
+          hint={signIn ? undefined : "At least 10 characters"}
           name="password"
           type="password"
           minLength={signIn ? undefined : 10}
