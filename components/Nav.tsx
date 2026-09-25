@@ -74,13 +74,13 @@ export function Nav() {
           >
             <GitHubMark />
           </a>
-          <AccountLink />
           <a
             href={RELEASES}
             className={buttonClass("primary", "px-4 py-2 text-sm")}
           >
             Download
           </a>
+          <AccountLink />
         </div>
       </div>
     </header>

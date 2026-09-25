@@ -18,7 +18,7 @@ export function AccountLink() {
       .catch(() => setUser(null));
   }, []);
 
-  const slot = "grid h-9 min-w-[64px] place-items-center";
+  const slot = "grid h-9 min-w-[64px] items-center justify-items-end";
   if (user === undefined) return <span className={slot} aria-hidden />;
 
   if (!user)
