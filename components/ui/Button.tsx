@@ -10,7 +10,8 @@ type Variant = "primary" | "secondary";
 const base =
   "inline-flex items-center justify-center gap-2.5 rounded-full px-5 py-2.5 text-[15px] font-semibold transition-[filter,border-color,opacity] disabled:pointer-events-none disabled:opacity-50";
 const variants: Record<Variant, string> = {
-  primary: "bg-accent text-on-accent hover:brightness-110",
+  // Dark text on the accent: ~8:1, where near-white on it is ~2:1.
+  primary: "bg-accent text-canvas hover:brightness-110",
   secondary: "border border-line-strong text-ink hover:border-marker/60",
 };
 

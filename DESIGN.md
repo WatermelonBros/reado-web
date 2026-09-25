@@ -72,7 +72,7 @@ spacing:
 components:
   button-primary:
     backgroundColor: "{colors.accent}"
-    textColor: "{colors.on-accent}"
+    textColor: "{colors.canvas}"
     typography: "{typography.label}"
     rounded: "{rounded.pill}"
     padding: "10px 20px"
@@ -206,7 +206,7 @@ Two shapes: the full pill (buttons, tags, avatar) and the straight hairline (row
 ### Buttons
 Soft, confident pills in one size.
 - **Shape:** full pill (9999px).
-- **Primary:** `accent` fill, `on-accent` text, 15px semibold, 10px 20px padding. The nav's Download uses the same pill at 14px, 8px 16px.
+- **Primary:** `accent` fill, `canvas` (dark) text — about 8:1, where `on-accent`'s near-white reads about 2:1 and is kept only for the app mock — 15px semibold, 10px 20px padding. The nav's Download uses the same pill at 14px, 8px 16px.
 - **Hover / Focus:** primary brightens (`brightness(1.1)`); focus is the global 2px `accent` outline at 2px offset. Disabled drops to 50% and ignores the pointer.
 - **Secondary:** transparent, 1px `line-strong` border, `ink` text; the border warms to `marker` at 60% on hover.
 
