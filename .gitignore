@@ -32,6 +32,8 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# Public build settings only (no secrets): the API address.
+!.env.production
 
 # vercel
 .vercel
