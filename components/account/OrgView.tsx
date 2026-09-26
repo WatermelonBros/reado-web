@@ -7,7 +7,7 @@ import { Display } from "@/components/ui/Display";
 import { Field } from "@/components/ui/Field";
 import { Tag } from "@/components/ui/Tag";
 import { TextButton, TextLink } from "@/components/ui/TextLink";
-import { ApiError, get, initials, post } from "./api";
+import { ApiError, get, initials, post, put } from "./api";
 import { AccountLayout, Lede } from "./AccountLayout";
 import { FORGES, type ForgeId, forgeLabel, forgeOAuth } from "./forges";
 
@@ -281,6 +281,7 @@ function OrgDetail({
   const [full, setFull] = useState<FullOrg | null>(null);
   const [connections, setConnections] = useState<Connection[]>([]);
   const [asking, setAsking] = useState<ForgeId | null>(null);
+  const [internalOnly, setInternalOnly] = useState<boolean | null>(null);
   const manage = org.role === "owner" || org.role === "admin";
   const here = `/account/org?id=${encodeURIComponent(org.id)}`;
 
@@ -292,6 +293,10 @@ function OrgDetail({
       ]);
       setFull(f);
       setConnections(c);
+      const p = await get<{ internalOnly: boolean }>(`/v1/excerpts/policy/${encodeURIComponent(org.id)}`).catch(
+        () => null,
+      );
+      setInternalOnly(p?.internalOnly ?? null);
     } catch (e) {
       onError((e as Error).message);
     }
@@ -462,6 +467,36 @@ function OrgDetail({
                 </Row>
               ))}
             </ul>
+          )}
+        </Section>
+      )}
+
+      {internalOnly !== null && (
+        <Section title="Share links">
+          <ul className="mt-5 border-b border-line">
+            <Row>
+              <span className="min-w-0 text-[15px] text-muted">
+                {internalOnly
+                  ? "Links to this organization's code open only for its members, after they sign in."
+                  : "Members choose: a link for the organization's members, or for anyone who has it."}
+              </span>
+              {manage ? (
+                <TextButton
+                  className="flex-none"
+                  onClick={act(() =>
+                    put(`/v1/excerpts/policy/${encodeURIComponent(org.id)}`, { internalOnly: !internalOnly }),
+                  )}>
+                  {internalOnly ? "Allow public links" : "Members only"}
+                </TextButton>
+              ) : (
+                <Tag tone="quiet">{internalOnly ? "members only" : "public allowed"}</Tag>
+              )}
+            </Row>
+          </ul>
+          {!internalOnly && manage && (
+            <p className="mt-4 text-[15px] text-muted">
+              Turning on members only also stops public links already made for your code.
+            </p>
           )}
         </Section>
       )}

@@ -5,9 +5,18 @@ import { Button } from "@/components/ui/Button";
 import { Display } from "@/components/ui/Display";
 import { Tag } from "@/components/ui/Tag";
 import { TextButton, TextLink } from "@/components/ui/TextLink";
-import { ApiError, get, initials, post, type SessionUser } from "./api";
+import { ago, ApiError, del, get, initials, post, type SessionUser } from "./api";
 import { AccountLayout, Lede } from "./AccountLayout";
 import { FORGES, type ForgeId, forgeOAuth } from "./forges";
+
+interface SharedLink {
+  id: string;
+  url: string;
+  repo: string;
+  file: string;
+  orgName: string | null;
+  expiresAt: string;
+}
 
 interface SessionRow {
   token: string;
@@ -24,25 +33,6 @@ function where(s: SessionRow): string {
   return os ? `${browser} on ${os}` : browser;
 }
 
-/** "3 minutes ago", in the reader's language. */
-function ago(iso: string): string {
-  const rtf = new Intl.RelativeTimeFormat(undefined, { numeric: "auto" });
-  const s = (new Date(iso).getTime() - Date.now()) / 1000;
-  const steps: [Intl.RelativeTimeFormatUnit, number][] = [
-    ["second", 60],
-    ["minute", 60],
-    ["hour", 24],
-    ["day", 30],
-    ["month", 12],
-  ];
-  let v = s;
-  for (const [unit, size] of steps) {
-    if (Math.abs(v) < size) return rtf.format(Math.round(v), unit);
-    v /= size;
-  }
-  return rtf.format(Math.round(v), "year");
-}
-
 /** The signed-in account: who you are, your plan, and where you're signed in. */
 export function AccountView() {
   const [me, setMe] = useState<{ user: SessionUser; session: { token: string } } | null>(null);
@@ -50,6 +40,8 @@ export function AccountView() {
   const [linked, setLinked] = useState<string[]>([]);
   const [forges, setForges] = useState<ForgeId[]>([]);
   const [orgs, setOrgs] = useState<{ id: string; name: string; role: string }[]>([]);
+  const [links, setLinks] = useState<SharedLink[]>([]);
+  const [stale, setStale] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function load() {
@@ -60,14 +52,19 @@ export function AccountView() {
         return;
       }
       setMe(s);
-      const [rows, accounts, providers, mine] = await Promise.all([
-        get<SessionRow[]>("/api/auth/list-sessions"),
+      const [rows, accounts, providers, mine, shared] = await Promise.all([
+        // The service lists sessions only for a sign-in younger than a day; an older
+        // one must not take the rest of the page down with it.
+        get<SessionRow[]>("/api/auth/list-sessions").catch(() => null),
         get<{ providerId: string }[]>("/api/auth/list-accounts"),
         get<Record<ForgeId, boolean>>("/v1/auth/providers"),
         get<{ id: string; name: string; role: string }[]>("/v1/orgs/mine").catch(() => []),
+        get<SharedLink[]>("/v1/excerpts").catch(() => []),
       ]);
+      setLinks(shared);
       setOrgs(mine);
-      setSessions(rows);
+      setSessions(rows ?? []);
+      setStale(rows === null);
       setLinked(accounts.map((a) => a.providerId));
       setForges(FORGES.map((f) => f.id).filter((id) => providers[id]));
     } catch (e) {
@@ -151,9 +148,62 @@ export function AccountView() {
             </li>
           </ul>
 
+          {links.length > 0 && (
+            <>
+              <h2 className="mt-14 text-[clamp(22px,2.4vw,30px)] font-semibold tracking-[-0.02em] text-bright">
+                Shared links
+              </h2>
+              <ul className="mt-5 border-b border-line">
+                {links.map((l) => (
+                  <li
+                    key={l.id}
+                    className="flex items-center justify-between gap-4 border-t border-line py-[clamp(14px,2vh,22px)]"
+                  >
+                    <span className="min-w-0">
+                      <a
+                        href={l.url}
+                        className="block truncate font-mono text-[15px] text-ink underline-offset-4 hover:text-bright hover:underline"
+                      >
+                        {l.file}
+                      </a>
+                      <span className="text-sm text-muted">
+                        {l.repo} · {l.orgName ? `members of ${l.orgName}` : "anyone with the link"} ·
+                        expires {ago(l.expiresAt)}
+                      </span>
+                    </span>
+                    <TextButton
+                      className="flex-none"
+                      onClick={async () => {
+                        await del(`/v1/excerpts/${encodeURIComponent(l.id)}`).catch(() =>
+                          setError("Couldn't revoke that link. Try again."),
+                        );
+                        void load();
+                      }}
+                    >
+                      Revoke
+                    </TextButton>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+
           <h2 className="mt-14 text-[clamp(22px,2.4vw,30px)] font-semibold tracking-[-0.02em] text-bright">
             Where you&rsquo;re signed in
           </h2>
+          {stale && (
+            <p className="mt-5 text-[15px] text-muted">
+              To see and sign out your devices, confirm it&rsquo;s you.{" "}
+              <TextButton
+                className="text-[15px]"
+                onClick={async () => {
+                  await post("/api/auth/sign-out").catch(() => {});
+                  location.href = "/sign-in?next=/account";
+                }}>
+                Sign in again
+              </TextButton>
+            </p>
+          )}
           <ul className="mt-5 border-b border-line">
             {[...sessions]
               // This browser first, then the most recently active.

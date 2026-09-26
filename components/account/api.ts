@@ -32,6 +32,8 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
 
 export const get = <T>(path: string) => request<T>("GET", path);
 export const post = <T>(path: string, body: unknown = {}) => request<T>("POST", path, body);
+export const del = <T>(path: string) => request<T>("DELETE", path);
+export const put = <T>(path: string, body: unknown) => request<T>("PUT", path, body);
 
 /** Where to go once signed in: back to the desktop app's flow, a page of this site
  *  (`?next=`, same-origin paths only), or the account page. */
@@ -59,3 +61,22 @@ export const initials = (name: string) =>
     .slice(0, 2)
     .map((w) => w[0]?.toUpperCase())
     .join("") || "?";
+
+/** "3 minutes ago", in the reader's language. */
+export function ago(iso: string): string {
+  const rtf = new Intl.RelativeTimeFormat(undefined, { numeric: "auto" });
+  const s = (new Date(iso).getTime() - Date.now()) / 1000;
+  const steps: [Intl.RelativeTimeFormatUnit, number][] = [
+    ["second", 60],
+    ["minute", 60],
+    ["hour", 24],
+    ["day", 30],
+    ["month", 12],
+  ];
+  let v = s;
+  for (const [unit, size] of steps) {
+    if (Math.abs(v) < size) return rtf.format(Math.round(v), unit);
+    v /= size;
+  }
+  return rtf.format(Math.round(v), "year");
+}
