@@ -152,7 +152,9 @@ export function OrgView() {
       setError(
         x instanceof ApiError && x.status === 400
           ? "That name is taken. Try another."
-          : (x as Error).message,
+          : x instanceof ApiError && x.status === 403
+            ? "Starting an organization takes Reado Pro: the organization pays a seat for each member, from the moment they accept."
+            : (x as Error).message,
       );
     }
   }
